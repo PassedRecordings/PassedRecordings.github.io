@@ -1,4 +1,19 @@
-#playlist,audio{background:#666;width:400px;padding:20px;}
-.active a{color:#5DB0E6;text-decoration:none;}
-li a{color:#eeeedd;background:#333;padding:5px;display:block;}
-li a:hover{text-decoration:none;}
+body {
+  background-color: #151919;
+}
+
+h1 {
+  color: #F9FAEE;
+  text-align: center;
+}
+
+p {
+  font-family: "Bodoni, Open Sans, sans-serif;
+  font-size: 20px;
+  font-color: #F9FAEE;
+}
+
+#playlist, audio {background:#151919; width:400px; padding:20px;}
+.active a {color:#5DB0E6;text-decoration:none;}
+li a {color:#eeeedd; background:#333; padding:5px; display:block;}
+li a:hover {text-decoration:none;}
