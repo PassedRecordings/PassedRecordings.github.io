@@ -6,28 +6,17 @@
         <!--<script src="AudioPlayer.js"></script>-->
         <canvas id="hydra-bg" width="1166" height="568"></canvas>
         <p>Here is our page!</p>
-        <audio id='music' controls autoplay>
+        <audio id="audio" preload="auto" tabindex="0" controls="" type="audio/mpeg">
+        <source type="audio/mp3" src="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3">
+        Sorry, your browser does not support HTML5 audio.
         </audio>
+    <ul id="playlist">
+        <li class="active"><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp33">Ed Herbers - Sublimation</a></li>
+        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/in-the-darkness-hope.mp3">Exit Chamber - In The Darkness, Hope</a></li>
+        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/nemophilist.mp3">On Idyl - Nemophilist</a></li>
+        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/soon.mp3">passengers - soon (Remix, featuring I felt it in my sleep</a></li>
+        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/blue-point.mp3">Asha Paters - Blue Point</a></li>
+    </ul>
 
-          <script>
-    function myFunction() {
-       fileArray = ["https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3",
-                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/in-the-darkness-hope.mp3",
-                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/nemophilist.mp3",
-                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/soon.mp3",
-                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/blue-point.mp3"];
-       var num = Math.floor(Math.random() * fileArray.length);
-       var x = document.getElementById("music");
-       x.src = fileArray[num]; 
-
-       var audio = document.getElementById("music");
-       audio.volume = 0.2;
-       audio.autoplay = true;
-       audio.load();
-    }
-
-    myFunction()
-
-</script>
     </body>
 </html>
