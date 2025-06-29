@@ -20,7 +20,7 @@
 
     myFunction()
 
-</script>
+
 
 //This one SHOULD go to the next track automagically
 var audio;
@@ -61,3 +61,4 @@ function run(link, player){
         audio[0].load();
         audio[0].play();
 }
+</script>
