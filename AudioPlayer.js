@@ -1,6 +1,10 @@
   <script>
     function myFunction() {
-       fileArray = ["sublimation.mp3", "in-the-darkness-hope.mp3", "nemophilist.mp3", "soon.mp3", "blue-point.mp3"];
+       fileArray = ["https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3",
+                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/in-the-darkness-hope.mp3",
+                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/nemophilist.mp3",
+                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/soon.mp3",
+                    "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/blue-point.mp3"];
        var num = Math.floor(Math.random() * fileArray.length);
        var x = document.getElementById("music");
        x.src = fileArray[num]; 
