@@ -1,4 +1,3 @@
-//This one SHOULD go to the next track automagically
 var audio;
 var playlist;
 var tracks;
