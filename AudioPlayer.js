@@ -1,7 +1,6 @@
 
 // First attempt - this sort of worked, but relied on having to refresh the page to select a new track
 //Ultimately we should delete this bit down to the next comment
-<script>
     function myFunction() {
        fileArray = ["https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3",
                     "https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/in-the-darkness-hope.mp3",
@@ -61,4 +60,3 @@ function run(link, player){
         audio[0].load();
         audio[0].play();
 }
-</script>
