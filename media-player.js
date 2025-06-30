@@ -21,8 +21,7 @@ jQuery(function ($) {
             ]
         });
         // initialize playlist and controls
-        var index = Math.floor(Math.random() * tracks.length),
-            playing = true,
+        var playing = true,
             mediaPath = 'https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/',
             extension = '',
             tracks = [{
@@ -51,6 +50,7 @@ jQuery(function ($) {
                 "duration": "4:22",
                 "file": "blue-point"
             }],
+            index = Math.floor(Math.random() * tracks.length),
             buildPlaylist = $.each(tracks, function(key, value) {
                 var trackNumber = value.track,
                     trackName = value.name,
