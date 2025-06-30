@@ -1,72 +1,66 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" >
+
 <head>
-<link rel="stylesheet" type="text/css" href="Styles.css">
-
-<script type="text/javascript" src="jquery-1.7.js"></script>
-
+  <meta charset="UTF-8">
+  <title>Passed Recordings Playlist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel='stylesheet' href='https://cdn.plyr.io/3.6.2/plyr.css'>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-    <body>
+<body translate="no">
+
+<div id="header-container" class="push">
+	<div id="header" class="branding">
+		<div id="logo">
+		<img src="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/03/092d3-passed-records__beige-single-1.png" alt="Passed Recordings logo" width="80" height="50" class="pr-logo" />
+		</div>
+		<div id="tagline">
+		<h1 class="top-name">Passed Recordings Playlist</h1>
+		</div>
+	</div>
+</div>
+
+<div id="hydra">
+
         <script src="Hydra-Sketch1.js" defer=""></script>
         <script src="https://unpkg.com/hydra-synth"></script>
-        <canvas id="hydra-bg" width="1166" height="568"></canvas>
-        <p>Here is our page!</p>
-<audio id="audio" preload="auto" tabindex="0" controls="" type="audio/mpeg">
-    <source type="audio/mp3" src="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3">
-        Sorry, your browser does not support HTML5 audio.
-</audio>
-    <ul id="playlist">
-        <li class="active"><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/sublimation.mp3">Ed Herbers - Sublimation</a></li>
-        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/in-the-darkness-hope.mp3">Exit Chamber - In The Darkness, Hope</a></li>
-        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/nemophilist.mp3">On Idyl - Nemophilist</a></li>
-        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/soon.mp3">passengers - soon (Remix, featuring I felt it in my sleep</a></li>
-        <li><a href="https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/blue-point.mp3">Asha Patera - Blue Point</a></li>
-    </ul>
+        <canvas id="hydra-bg" class="hydra-graphic"></canvas>
+
+</div>
+
+<div class="outside-container">
+<div class="container">
+    <div class="column add-bottom">
+        <div id="mainwrap">
+            <div id="nowPlay">
+                <span id="npAction">Paused...</span><span id="npTitle"></span>
+            </div>
+            <div id="audiowrap">
+                <div id="audio0">
+                    <audio id="audio1" preload controls <!--autoplay-->>Your browser does not support HTML5 Audio</audio>
+                </div>
+                <div id="tracks">
+                    <a id="btnPrev">&larr;</a><a id="btnNext">&rarr;</a>
+                </div>
+            </div>
+            <div id="plwrap">
+                <ul id="plList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<p class="center footer-text">&copy; 2025 Passed Recordings</p>
 
 
-<!--AudioPlayer Script, MUST BE IN HTML -->
-<script type="text/javascript">
+<script type="text/javascript" src="plyr-3.6.8.js"></script>
+<script type="text/javascript" src="jquery-3.6.js"></script>
+<script type="text/javascript" src="media-player.js"></script>
 
-var audio;
-var playlist;
-var tracks;
-var current;
-
-init();
-function init(){
-    current = 0;
-    audio = $('audio');
-    playlist = $('#playlist');
-    tracks = playlist.find('li a');
-    len = tracks.length - 1;
-    audio[0].volume = .10;
-    audio[0].play();
-    playlist.find('a').click(function(e){
-        e.preventDefault();
-        link = $(this);
-        current = link.parent().index();
-        run(link, audio[0]);
-    });
-    audio[0].addEventListener('ended',function(e){
-        current++;
-        if(current == len){
-            current = 0;
-            link = playlist.find('a')[0];
-        }else{
-            link = playlist.find('a')[current];    
-        }
-        run($(link),audio[0]);
-    });
-}
-function run(link, player){
-        player.src = link.attr('href');
-        par = link.parent();
-        par.addClass('active').siblings().removeClass('active');
-        audio[0].load();
-        audio[0].play();
-}
-
-  </script>
-
-        
-    </body>
+</body>
 </html>
