@@ -1,19 +1,232 @@
-body {
-  background-color: #151919;
+/* Font Family
+================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap");
+
+
+/* Global Styles
+================================================== */
+
+html,body {
+-webkit-font-smoothing:antialiased;
+-webkit-text-size-adjust:100%;
+background-color:#151919;
+color:#F9FAEE;
+font-size:1.05rem;
+font-family: "Bodoni Moda", arial, sans-serif;
+font-weight:400;
+letter-spacing:.025rem;
+line-height:1.6;
+padding:0px;
 }
 
-h1 {
-  color: #F9FAEE;
-  text-align: center;
+*,::before,::after {
+box-sizing:border-box;
 }
 
-p {
-  font-family: "Bodoni, Open Sans, sans-serif;
-  font-size: 20px;
-  font-color: #F9FAEE;
+* {
+-webkit-tap-highlight-color:rgba(0, 0, 0, 0);
+-webkit-tap-highlight-color:transparent;
 }
 
-#playlist, audio {background:#151919; width:400px; padding:20px;}
-.active a {color:#5DB0E6;text-decoration:none;}
-li a {color:#eeeedd; background:#333; padding:5px; display:block;}
-li a:hover {text-decoration:none;}
+
+/* Setup
+================================================== */
+
+.outside-container {margin:0 auto; width:100%; background-color:#414D4B; padding-top:30px; padding-bottom:50px;}
+.container { position:relative; margin:0 auto; max-width:800px; width:100%; background-color:#414D4B; }
+.column { width:inherit; }
+.push {position:relative; height:130px;}
+.branding {margin:0 auto; width:100%; line-height:75px;}
+img.pr-logo {width:75px; height:75px; margin-top:30px; margin-left:20px;}
+#logo {position:relative;}
+#tagline {position:relative; margin-left:90px; margin-top:-125px;}
+
+/* Typography / Links
+================================================== */
+
+p { color:#F9FAEE; display:block; font-size:1.05rem; font-weight:400; margin:0 0 2px; }
+
+a,a:visited { color:#F9FAEE; outline:0; text-decoration:underline; }
+a:hover,a:focus { color:#AAB497; }
+p a,p a:visited { line-height:inherit; }
+h1.top-name {color:#F1DFC7; font-weight:500; margin-left:30px;}
+p.footer-text {color:#F1DFC7; margin:50px;}
+
+/* Misc.
+================================================== */
+
+.add-bottom { margin-bottom:2rem !important; }
+.left { float:left; }
+.right { float:right; }
+.center { text-align:center; }
+.hidden { display:none; }
+
+.no-support {
+margin:2rem auto;
+text-align:center;
+width:90%;
+}
+
+
+/* Audio Player Styles
+================================================== */
+
+audio {
+display:none;
+}
+
+#audiowrap,
+#plwrap {
+margin:0 auto;
+}
+
+#tracks {
+font-size:0;
+position:relative;
+text-align:center;
+}
+
+#nowPlay {
+display:block;
+font-size:0;
+}
+
+#nowPlay span {
+display:inline-block;
+font-size:1.05rem;
+vertical-align:top;
+}
+
+#nowPlay span#npAction {
+padding:21px;
+width:30%;
+}
+
+#nowPlay span#npTitle {
+padding:21px;
+text-align:right;
+width:70%;
+}
+
+#plList li {
+cursor:pointer;
+display:block;
+margin:0;
+padding:21px 0;
+}
+
+#plList li:hover {
+background-color:rgba(21,25,25,.25);
+}
+
+.plItem {
+position:relative;
+}
+
+.plTitle {
+left:50px;
+overflow:hidden;
+position:absolute;
+right:65px;
+text-overflow:ellipsis;
+top:0;
+white-space:nowrap;
+}
+
+.plNum {
+padding-left:21px;
+width:25px;
+}
+
+.plLength {
+padding-left:21px;
+position:absolute;
+right:21px;
+top:0;
+}
+
+.plSel,
+.plSel:hover {
+background-color:rgba(21,25,25,.5);
+color:#fff;
+cursor:default !important;
+}
+
+#tracks a {
+border-radius:3px;
+color:#fff;
+cursor:pointer;
+display:inline-block;
+font-size:2.3rem;
+height:40px;
+line-height:.2;
+margin:0 5px 30px;
+padding:12px;
+text-decoration:none;
+transition:background .3s ease;
+}
+
+#tracks a:hover,
+#tracks a:active {
+background-color:rgba(21,25,25,.25);
+color:#fff;
+}
+
+#tracks a::-moz-focus-inner {
+border:0;
+padding:0;
+}
+
+
+/* Plyr Overrides
+================================================== */
+
+.plyr--audio .plyr__controls {
+background-color:transparent;
+border:none;
+color:#fff;
+font-family: "Bodoni Moda", arial, sans-serif;
+padding:20px 20px 20px 13px;
+width:100%;
+}
+
+a.plyr__controls__item.plyr__control:hover,
+.plyr--audio .plyr__controls button:hover,
+.plyr--audio .plyr__controls button.tab-focus:focus,
+.plyr__play-large {
+background-color:rgba(21,25,25,.5);
+}
+
+.plyr__progress--played,
+.plyr__volume--display {
+color:rgba(21,25,25,.5);
+}
+
+.plyr--audio .plyr__progress--buffer,
+.plyr--audio .plyr__volume--display {
+background-color:rgba(21,25,25,.5);
+}
+
+.plyr--audio .plyr__progress--buffer {
+color:rgba(21,25,25,.5);
+}
+
+.plyr__controls .plyr__controls__item.plyr__time {
+font-size:14px;
+margin-left:7px;
+}
+
+
+/* Media Queries
+================================================== */
+
+@media only screen and (max-width:600px) {
+    #nowPlay span#npAction { display:none; }
+    #nowPlay span#npTitle { display:block; text-align:center; width:100%; }
+    .hydra-graphic {width:100%; max-height:300px;}
+}
+
+@media only screen and (min-width:601px) {
+    .hydra-graphic {width:100%; max-height:600px;}
+}
