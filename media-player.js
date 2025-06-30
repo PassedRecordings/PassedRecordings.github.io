@@ -85,10 +85,12 @@ jQuery(function ($) {
                 } else if(newTrack+1 == trackCount){
                     index = 0;
                     loadTrack(index);
+                    audio.play();
                 }
                 else{
                     index = newTrack+1;
                     loadTrack(index);
+                    audio.play();
                 }
             }).get(0),
             btnPrev = $('#btnPrev').on('click', function () {
