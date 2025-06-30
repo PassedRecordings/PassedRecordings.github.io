@@ -61,7 +61,7 @@ p.footer-text {color:#F1DFC7; margin:50px;}
 .right { float:right; }
 .center { text-align:center; }
 .hidden { display:none; }
-.hydraSketch {width:33%;  margin: auto;}
+.hydraSketch {width:33%;  margin: auto; border: 2px black}
 .no-support {
 margin:2rem auto;
 text-align:center;
