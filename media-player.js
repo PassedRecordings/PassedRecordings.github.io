@@ -85,7 +85,7 @@ jQuery(function ($) {
     index = newIndex;
     loadTrack(index);
     audio.play();
-}).get(0),,
+}).get(0),
 
             btnPrev = $('#btnPrev').on('click', function () {
                 if ((index - 1) > -1) {
