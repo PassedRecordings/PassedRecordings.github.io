@@ -85,7 +85,7 @@ jQuery(function ($) {
     index = newIndex;
     loadTrack(index);
     audio.play();
-}),
+}).get(0),,
 
             btnPrev = $('#btnPrev').on('click', function () {
                 if ((index - 1) > -1) {
@@ -138,6 +138,7 @@ jQuery(function ($) {
             };
         extension = audio.canPlayType('audio/mpeg') ? '.mp3' : audio.canPlayType('audio/ogg') ? '.ogg' : '';
         loadTrack(index);
+        audio.play();
     } else {
         // no audio support
         $('.column').addClass('hidden');
