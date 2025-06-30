@@ -76,23 +76,17 @@ jQuery(function ($) {
                 playing = false;
                 npAction.text('Paused...');
             }).on('ended', function () {
-                npAction.text('Paused...');
-                newTrack = Math.floor(Math.random() * tracks.length);
-                if (index != newTrack) {
-                    index = newTrack;
-                    loadTrack(index);
-                    audio.play();
-                } else if(newTrack+1 == trackCount){
-                    index = 0;
-                    loadTrack(index);
-                    audio.play();
-                }
-                else{
-                    index = newTrack+1;
-                    loadTrack(index);
-                    audio.play();
-                }
-            }).get(0),
+    npAction.text('Paused...');
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * tracks.length);
+    } while (newIndex === index && tracks.length > 1);
+
+    index = newIndex;
+    loadTrack(index);
+    audio.play();
+}),
+
             btnPrev = $('#btnPrev').on('click', function () {
                 if ((index - 1) > -1) {
                     index--;
