@@ -1,7 +1,2 @@
 s0.initImage("https://i.postimg.cc/rmDMWZCs/Passed-Records-Biege-Single.png")
-b = 0
-update = () => b += 0.05 * Math.sin(time/30)
-
-osc(16,0.1,0.1).hue(0.5,0.7,()=>b)
-  .saturate(()=>b/5)
-  .pixelate(16,40).modulateKaleid(src(s0),64).out()
+src(s0).colorama(10).saturate(() => Math.sin(time)*10).rotate(({time})=>(time)/2).modulate(osc(25,0.1,0.5).kaleid(50).scale(({time})=>Math.sin(time*1)*0.5+1).modulate(noise(0.08,0.06)),0.05).out(o0)
