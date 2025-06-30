@@ -1,4 +1,4 @@
-  noise()
+  noise(10,0.1)
 	.blend(osc()
 		.modulate(noise()), () => Math.cos(((time / 10) + 1) / 2))
 .modulateKaleid(osc(20).modulate(noise(3)))
