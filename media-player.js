@@ -77,13 +77,17 @@ jQuery(function ($) {
                 npAction.text('Paused...');
             }).on('ended', function () {
                 npAction.text('Paused...');
-                if ((index + 1) < trackCount) {
-                    index++;
+                newTrack = Math.floor(Math.random() * tracks.length),
+                if (index != newTrack) {
+                    index = newTrack;
                     loadTrack(index);
                     audio.play();
-                } else {
-                    audio.pause();
+                } else if(newTrack+1 == trackCount){
                     index = 0;
+                    loadTrack(index);
+                }
+                else{
+                    index = newTrack+1;
                     loadTrack(index);
                 }
             }).get(0),
