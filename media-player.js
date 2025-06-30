@@ -21,8 +21,8 @@ jQuery(function ($) {
             ]
         });
         // initialize playlist and controls
-        var index = 0,
-            playing = false,
+        var index = Math.floor(Math.random() * tracks.length),
+            playing = true,
             mediaPath = 'https://passedrecordingsblog.wordpress.com/wp-content/uploads/2025/06/',
             extension = '',
             tracks = [{
