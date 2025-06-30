@@ -77,7 +77,7 @@ jQuery(function ($) {
                 npAction.text('Paused...');
             }).on('ended', function () {
                 npAction.text('Paused...');
-                newTrack = Math.floor(Math.random() * tracks.length),
+                newTrack = Math.floor(Math.random() * tracks.length);
                 if (index != newTrack) {
                     index = newTrack;
                     loadTrack(index);
