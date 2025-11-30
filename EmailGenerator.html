@@ -20,11 +20,8 @@
   <label for="sheetUrl">Public Google Sheets CSV URL:</label>
   <input id="sheetUrl" placeholder="Paste the published CSV link here" />
 
-  <label for="codeInput">Enter code:</label>
-  <input id="codeInput" placeholder="e.g., ABC123" />
-
-  <button id="loadBtn">Load Data</button>
-  <button id="generateBtn">Generate Email Text</button>
+  <button id="loadBtn"">Load Data</button>
+  <button id="generateAllBtn">Generate Email Text for All</button>
 
   <h2>Output</h2>
   <textarea id="output" readonly></textarea>
@@ -56,32 +53,28 @@
       }
     }
 
-    function generateText() {
-      const code = document.getElementById('codeInput').value.trim();
-      if (!code) { alert('Enter a code first.'); return; }
+    function generateAll() {
       if (!sheetData.length) { alert('Load the sheet first.'); return; }
+      let output = '';
+      sheetData.forEach(row => {
+        if (!row.code) return;
+        output += `Hello,
 
-      const match = sheetData.find(row => row.code === code);
-      if (!match) {
-        document.getElementById('output').value = 'Code not found.';
-        return;
-      }
-
-      // Example email template — customize as needed
-      const text = `Hello,
-
-Here is the information for code: ${match.code}
-Description: ${match.description}
-Value: ${match.value}
+Here is the information for code: ${row.code}
+Description: ${row.description}
+Value: ${row.value}
 
 Let me know if you need anything else.
-`;
 
-      document.getElementById('output').value = text;
+---
+
+`;
+      });
+      document.getElementById('output').value = output.trim();
     }
 
     document.getElementById('loadBtn').addEventListener('click', loadSheet);
-    document.getElementById('generateBtn').addEventListener('click', generateText);
+    document.getElementById('generateAllBtn').addEventListener('click', generateText);
   </script>
 </body>
 </html>
