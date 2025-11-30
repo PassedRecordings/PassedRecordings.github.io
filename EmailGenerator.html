@@ -1,80 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Email Text Generator</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Google Sheets → Email Texts</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    label, button { display: block; margin-top: 1rem; }
-    textarea { width: 100%; height: 150px; margin-top: 1rem; }
-    input { width: 100%; padding: 0.5rem; }
-    #result { white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; margin-top: 1rem; }
+    :root{font-family:Inter, system-ui, -apple-system, Arial, sans-serif}
+    body{max-width:900px;margin:28px auto;padding:0 18px;color:#111}
+    h1{font-size:1.4rem;margin-bottom:0.25rem}
+    p{margin-top:0;color:#444}
+    input, button, textarea{font:inherit}
+    input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    button{padding:8px 12px;border-radius:8px;border:1px solid #888;background:#fff;cursor:pointer}
+    button.primary{background:#111;color:#fff;border-color:#111}
+    textarea#output{width:100%;height:320px;margin-top:12px;padding:12px;border-radius:8px;border:1px solid #ccc;white-space:pre-wrap}
+    .hint{font-size:0.9rem;color:#666;margin-top:8px}
   </style>
 </head>
 <body>
-  <h1>Email Text Generator</h1>
+  <h1>Google Sheets → Email Texts</h1>
+  <p>Paste the <strong>CSV export</strong> URL from a publicly-published Google Sheet (File → Publish to the web → CSV or use the "export?format=csv" URL). Click <em>Load</em>, then <em>Generate All</em> to create email text for every row.</p>
 
-  <p>This tool pulls data from a public Google Sheet and turns selected codes into ready‑to‑copy email text.</p>
+  <label for="sheetUrl">Public Google Sheets CSV URL</label>
+  <input id="sheetUrl" type="text" placeholder="https://docs.google.com/spreadsheets/d/XXXXX/export?format=csv&gid=0" />
 
-  <label for="sheetUrl">Public Google Sheets CSV URL:</label>
-  <input id="sheetUrl" placeholder="Paste the published CSV link here" />
+  <div class="controls">
+    <button id="loadBtn" class="primary">Load Sheet</button>
+    <button id="generateAllBtn">Generate Email Text for All</button>
+    <button id="downloadBtn">Download as .txt</button>
+    <button id="copyBtn">Copy All to Clipboard</button>
+  </div>
 
-  <button id="loadBtn"">Load Data</button>
-  <button id="generateAllBtn">Generate Email Text for All</button>
-
-  <h2>Output</h2>
-  <textarea id="output" readonly></textarea>
+  <div class="hint">Output will appear below. Each email block is separated by <code>---</code>.</div>
+  <textarea id="output" readonly placeholder="Generated email text will appear here..."></textarea>
 
   <script>
+    // Small robust CSV parser that handles quoted fields with commas and newlines.
+    function parseCSV(text) {
+      const rows = [];
+      let cur = '';
+      let row = [];
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i+1];
+        if (ch === '"') {
+          if (inQuotes && next === '"') { // escaped quote
+            cur += '"';
+            i++; // skip the escaped quote
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+        if (!inQuotes && ch === ',') {
+          row.push(cur);
+          cur = '';
+          continue;
+        }
+        if (!inQuotes && (ch === '\n' || (ch === '\r' && next === '\n'))) {
+          // handle CRLF
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = '';
+          if (ch === '\r' && next === '\n') i++; // skip LF after CR
+          continue;
+        }
+        cur += ch;
+      }
+      // push any remaining
+      if (cur !== '' || row.length) {
+        row.push(cur);
+        rows.push(row);
+      }
+      return rows;
+    }
+
     let sheetData = [];
+    function normalizeHeader(h){ return h ? h.trim().toLowerCase() : '' }
 
     async function loadSheet() {
-      const url = document.getElementById('sheetUrl').value;
-      if (!url) { alert('Please provide a Google Sheets CSV URL.'); return; }
-
+      const url = document.getElementById('sheetUrl').value.trim();
+      if (!url) { alert('Please paste the CSV export URL from your Google Sheet.'); return; }
       try {
         const res = await fetch(url);
+        if (!res.ok) throw new Error('Network response not ok: ' + res.status);
         const text = await res.text();
-        const rows = text.split(/\r?\n/).map(r => r.split(','));
-
-        // Convert rows to objects using header row
-        const headers = rows[0];
-        sheetData = rows.slice(1).map(row => {
-          let obj = {};
-          headers.forEach((h, i) => obj[h.trim()] = row[i]);
+        const rows = parseCSV(text);
+        if (!rows.length) { alert('CSV appears empty'); return; }
+        const headers = rows[0].map(normalizeHeader);
+        sheetData = rows.slice(1).map(r => {
+          const obj = {};
+          for (let i = 0; i < headers.length; i++) obj[headers[i] || `col${i+1}`] = r[i] !== undefined ? r[i].trim() : '';
           return obj;
         });
-        alert('Sheet loaded successfully!');
-
+        alert('Sheet loaded: ' + sheetData.length + ' rows');
       } catch (err) {
         console.error(err);
-        alert('Failed to load sheet. Make sure the link is a public CSV export.');
+        alert('Failed to load sheet. Make sure the URL is a public CSV export and CORS is allowed. See console for details.');
       }
+    }
+
+    // Example template generator. Customize this function to match your columns.
+    function buildEmailForRow(row) {
+      // Try common column names (case-insensitive): code, description, value, name, email
+      const code = row['code'] || row['id'] || row['sku'] || '';
+      const description = row['description'] || row['details'] || '';
+      const value = row['value'] || row['amount'] || '';
+      const name = row['name'] || '';
+
+      let header = 'Hello';
+      if (name) header += ' ' + name;
+      header += ',';
+
+      return `${header}\n\nHere is the information for code: ${code}\nDescription: ${description}\nValue: ${value}\n\nIf you need anything else, let me know.\n`;
     }
 
     function generateAll() {
       if (!sheetData.length) { alert('Load the sheet first.'); return; }
-      let output = '';
-      sheetData.forEach(row => {
-        if (!row.code) return;
-        output += `Hello,
-
-Here is the information for code: ${row.code}
-Description: ${row.description}
-Value: ${row.value}
-
-Let me know if you need anything else.
-
----
-
-`;
-      });
-      document.getElementById('output').value = output.trim();
+      const blocks = [];
+      for (const row of sheetData) {
+        // skip rows with no meaningful identifier
+        if (!(row['code'] || row['id'] || row['sku'])) continue;
+        blocks.push(buildEmailForRow(row));
+      }
+      const out = blocks.join('\n---\n\n');
+      document.getElementById('output').value = out;
     }
 
+    function copyAll() {
+      const text = document.getElementById('output').value;
+      if (!text) { alert('Nothing to copy. Generate first.'); return; }
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard');
+      }).catch(err => {
+        console.error(err);
+        alert('Copy failed (maybe insecure context). Try downloading instead.');
+      });
+    }
+
+    function downloadAll() {
+      const text = document.getElementById('output').value;
+      if (!text) { alert('Nothing to download. Generate first.'); return; }
+      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'emails.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Wire buttons
     document.getElementById('loadBtn').addEventListener('click', loadSheet);
-    document.getElementById('generateAllBtn').addEventListener('click', generateText);
+    document.getElementById('generateAllBtn').addEventListener('click', generateAll);
+    document.getElementById('copyBtn').addEventListener('click', copyAll);
+    document.getElementById('downloadBtn').addEventListener('click', downloadAll);
   </script>
 </body>
 </html>
