@@ -1,149 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Google Sheets → Email Texts</title>
+  <title>Bulk Email Generator — Paste Codes</title>
   <style>
     :root{font-family:Inter, system-ui, -apple-system, Arial, sans-serif}
     body{max-width:900px;margin:28px auto;padding:0 18px;color:#111}
     h1{font-size:1.4rem;margin-bottom:0.25rem}
     p{margin-top:0;color:#444}
-    input, button, textarea{font:inherit}
+    textarea, input, button{font:inherit}
+    textarea{width:100%;min-height:200px;padding:12px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;white-space:pre-wrap}
     input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px}
     .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     button{padding:8px 12px;border-radius:8px;border:1px solid #888;background:#fff;cursor:pointer}
     button.primary{background:#111;color:#fff;border-color:#111}
-    textarea#output{width:100%;height:320px;margin-top:12px;padding:12px;border-radius:8px;border:1px solid #ccc;white-space:pre-wrap}
     .hint{font-size:0.9rem;color:#666;margin-top:8px}
+    .small{font-size:0.9rem;color:#666}
+    label{display:block;margin-top:12px}
+    footer{margin-top:18px;color:#666;font-size:0.9rem}
+    .row{display:flex;gap:8px;align-items:center}
   </style>
 </head>
 <body>
-  <h1>Google Sheets → Email Texts</h1>
-  <p>Paste the <strong>CSV export</strong> URL from a publicly-published Google Sheet (File → Publish to the web → CSV or use the "export?format=csv" URL). Click <em>Load</em>, then <em>Generate All</em> to create email text for every row.</p>
+  <h1>Bulk Email Generator — Paste Codes</h1>
+  <p>Paste your codes (one per line, or separated by commas/spaces) into the box below and click <strong>Generate Emails</strong>.</p>
 
-  <label for="sheetUrl">Public Google Sheets CSV URL</label>
-  <input id="sheetUrl" type="text" placeholder="https://docs.google.com/spreadsheets/d/XXXXX/export?format=csv&gid=0" />
+  <label for="codesInput">Paste codes here</label>
+  <textarea id="codesInput" placeholder="sdty-35u5
+7mf4-396r
+vbah-cz9l
+..."></textarea>
 
   <div class="controls">
-    <button id="loadBtn" class="primary">Load Sheet</button>
-    <button id="generateAllBtn">Generate Email Text for All</button>
-    <button id="downloadBtn">Download as .txt</button>
-    <button id="copyBtn">Copy All to Clipboard</button>
+    <button id="generateBtn" class="primary">Generate Emails</button>
+    <button id="copyBtn">Copy All</button>
+    <button id="downloadBtn">Download .txt</button>
+    <button id="clearBtn">Clear</button>
   </div>
 
-  <div class="hint">Output will appear below. Each email block is separated by <code>---</code>.</div>
-  <textarea id="output" readonly placeholder="Generated email text will appear here..."></textarea>
+  <div class="hint">Output (each email block separated by <code>---</code>):</div>
+  <textarea id="output" readonly placeholder="Generated emails will appear here..."></textarea>
+
+  <footer>
+    Template: <span class="small">Option A — Simple</span>
+  </footer>
 
   <script>
-    // Small robust CSV parser that handles quoted fields with commas and newlines.
-    function parseCSV(text) {
-      const rows = [];
-      let cur = '';
-      let row = [];
-      let inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        const next = text[i+1];
-        if (ch === '"') {
-          if (inQuotes && next === '"') { // escaped quote
-            cur += '"';
-            i++; // skip the escaped quote
-          } else {
-            inQuotes = !inQuotes;
-          }
-          continue;
-        }
-        if (!inQuotes && ch === ',') {
-          row.push(cur);
-          cur = '';
-          continue;
-        }
-        if (!inQuotes && (ch === '\n' || (ch === '\r' && next === '\n'))) {
-          // handle CRLF
-          row.push(cur);
-          rows.push(row);
-          row = [];
-          cur = '';
-          if (ch === '\r' && next === '\n') i++; // skip LF after CR
-          continue;
-        }
-        cur += ch;
-      }
-      // push any remaining
-      if (cur !== '' || row.length) {
-        row.push(cur);
-        rows.push(row);
-      }
-      return rows;
+    // Parse pasted codes: accepts newlines, commas, spaces. Removes empty entries.
+    function parseCodes(text) {
+      if (!text) return [];
+      // replace common separators with newline, then split
+      const unified = text.replace(/[,;]+/g, '\\n').replace(/\\s+\\n/g, '\\n');
+      const parts = unified.split(/\\n|\\r|\\s+/).map(s => s.trim()).filter(Boolean);
+      // keep only reasonable-looking codes (optional): remove entries shorter than 3 characters
+      return parts.filter(p => p.length >= 3);
     }
 
-    let sheetData = [];
-    function normalizeHeader(h){ return h ? h.trim().toLowerCase() : '' }
+    // Build single email using Option A (Simple)
+    function buildEmail(code) {
+      return [
+        "Hello,",
+        "",
+        "Here is your download code:",
+        code,
+        "",
+        "Enjoy the music!"
+      ].join("\\n");
+    }
 
-    async function loadSheet() {
-      const url = document.getElementById('sheetUrl').value.trim();
-      if (!url) { alert('Please paste the CSV export URL from your Google Sheet.'); return; }
+    function generateEmails() {
+      const raw = document.getElementById('codesInput').value;
+      const codes = parseCodes(raw);
+      if (!codes.length) {
+        alert('No codes found. Paste your codes into the top box (one per line or comma separated).');
+        return;
+      }
+
+      const blocks = codes.map(c => buildEmail(c));
+      const joined = blocks.join("\\n\\n---\\n\\n");
+      document.getElementById('output').value = joined;
+    }
+
+    async function copyAll() {
+      const text = document.getElementById('output').value;
+      if (!text) { alert('Nothing to copy. Generate emails first.'); return; }
       try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Network response not ok: ' + res.status);
-        const text = await res.text();
-        const rows = parseCSV(text);
-        if (!rows.length) { alert('CSV appears empty'); return; }
-        const headers = rows[0].map(normalizeHeader);
-        sheetData = rows.slice(1).map(r => {
-          const obj = {};
-          for (let i = 0; i < headers.length; i++) obj[headers[i] || `col${i+1}`] = r[i] !== undefined ? r[i].trim() : '';
-          return obj;
-        });
-        alert('Sheet loaded: ' + sheetData.length + ' rows');
+        await navigator.clipboard.writeText(text);
+        alert('Copied to clipboard!');
       } catch (err) {
         console.error(err);
-        alert('Failed to load sheet. Make sure the URL is a public CSV export and CORS is allowed. See console for details.');
+        alert('Copy failed — your browser may block clipboard access. Try downloading instead.');
       }
     }
 
-    // Example template generator. Customize this function to match your columns.
-    function buildEmailForRow(row) {
-      // Try common column names (case-insensitive): code, description, value, name, email
-      const code = row['code'] || row['id'] || row['sku'] || '';
-      const description = row['description'] || row['details'] || '';
-      const value = row['value'] || row['amount'] || '';
-      const name = row['name'] || '';
-
-      let header = 'Hello';
-      if (name) header += ' ' + name;
-      header += ',';
-
-      return `${header}\n\nHere is the information for code: ${code}\nDescription: ${description}\nValue: ${value}\n\nIf you need anything else, let me know.\n`;
-    }
-
-    function generateAll() {
-      if (!sheetData.length) { alert('Load the sheet first.'); return; }
-      const blocks = [];
-      for (const row of sheetData) {
-        // skip rows with no meaningful identifier
-        if (!(row['code'] || row['id'] || row['sku'])) continue;
-        blocks.push(buildEmailForRow(row));
-      }
-      const out = blocks.join('\n---\n\n');
-      document.getElementById('output').value = out;
-    }
-
-    function copyAll() {
+    function downloadTxt() {
       const text = document.getElementById('output').value;
-      if (!text) { alert('Nothing to copy. Generate first.'); return; }
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard');
-      }).catch(err => {
-        console.error(err);
-        alert('Copy failed (maybe insecure context). Try downloading instead.');
-      });
-    }
-
-    function downloadAll() {
-      const text = document.getElementById('output').value;
-      if (!text) { alert('Nothing to download. Generate first.'); return; }
+      if (!text) { alert('Nothing to download. Generate emails first.'); return; }
       const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -155,11 +108,23 @@
       URL.revokeObjectURL(url);
     }
 
-    // Wire buttons
-    document.getElementById('loadBtn').addEventListener('click', loadSheet);
-    document.getElementById('generateAllBtn').addEventListener('click', generateAll);
+    function clearAll() {
+      if (!confirm('Clear both input and output?')) return;
+      document.getElementById('codesInput').value = '';
+      document.getElementById('output').value = '';
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generateEmails);
     document.getElementById('copyBtn').addEventListener('click', copyAll);
-    document.getElementById('downloadBtn').addEventListener('click', downloadAll);
+    document.getElementById('downloadBtn').addEventListener('click', downloadTxt);
+    document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+    // Optional: allow Ctrl/Cmd+Enter in input to generate quickly
+    document.getElementById('codesInput').addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault(); generateEmails();
+      }
+    });
   </script>
 </body>
 </html>
