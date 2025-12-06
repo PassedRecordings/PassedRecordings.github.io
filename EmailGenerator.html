@@ -35,6 +35,9 @@ vbah-cz9l
   <label for="a-name">Artist name:</label>
   <input type="text" id="a-name" name="artistname" placeholder="Chris Hobbs"><br><br>
 
+  <label for="album-name">Release name:</label>
+  <input type="text" id="album-name" name="albumname" placeholder="Christmas Passed"><br><br>
+
   <label for="description">Release description:</label>
   <input type="text" id="r-description" name="releasedescription" placeholder="an ambient representation of an ethereal trip through time and space"><br><br>
   
@@ -82,27 +85,35 @@ vbah-cz9l
 
 // Build single email 
 function buildEmail(code) {
+  // Get values from form fields
+  const artist = document.getElementById("a-name").value || "[ARTIST NAME]";
+  const description = document.getElementById("r-description").value || "[DESCRIPTION]";
+  const recommended = document.getElementById("recommended-for").value || "[RECOMMENDED]";
+  const releaseDate = document.getElementById("release-date").value || "[RELEASE DATE]";
+  const albumName = document.getElementById("album-name")?.value || "[ALBUM NAME]";
+
   return [
     "Hello!",
     "",
-    "I hope this message finds you well. I am [ARTIST NAME] from the atmospheric music collective, Passed Recordings.",
+    `I hope this message finds you well. I am ${artist} from the atmospheric music collective, Passed Recordings.`,
     "",
-    "I know you are really busy and already receive tons of requests like this, but I would love to share a copy of [ALBUM NAME] with you!",
+    `I know you are really busy and already receive tons of requests like this, but I would love to share a copy of ${albumName} with you!`,
     "",
-    "[ALBUM NAME] (Release Date: [RELEASE DATE]) is [DESCRIPTION].",
+    `${albumName} (Release Date: ${releaseDate}) is ${description}.`,
     "",
-    "Definitely recommended for fans of [RECOMMENDATION TEXT].",
+    `Definitely recommended for fans of ${recommended}.`,
     "",
     "Please head to my Bandcamp page using the following link:",
-    "https://passedrecordings.bandcamp.com/yum?code=" + code,
+    `https://passedrecordings.bandcamp.com/yum?code=${code}`,
     "",
     "If the page asks for a code, enter:",
     code,
     "",
     "Thank you for your time!",
-    "[ARTIST NAME] // Passed Recordings // Always Atmospheric 🕊️"
+    `${artist} // Passed Recordings // Always Atmospheric 🕊️`
   ].join("\n");
 }
+
 
 
   function generateEmails() {
