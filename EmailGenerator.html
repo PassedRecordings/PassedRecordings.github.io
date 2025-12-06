@@ -83,13 +83,36 @@ vbah-cz9l
     return codes.filter(c => c.length >= 3);
   }
 
+  function formatPrettyDate(isoDateString) {
+  if (!isoDateString) return "[RELEASE DATE]";
+
+  const date = new Date(isoDateString);
+
+  const day = date.getDate();
+  const month = date.toLocaleString("en-GB", { month: "long" });
+  const year = date.getFullYear();
+
+  // Add ordinal suffix to the day
+  const j = day % 10,
+        k = day % 100;
+
+  let suffix = "th";
+  if (j === 1 && k !== 11) suffix = "st";
+  else if (j === 2 && k !== 12) suffix = "nd";
+  else if (j === 3 && k !== 13) suffix = "rd";
+
+  return `${day}${suffix} ${month} ${year}`;
+}
+
+
 // Build single email 
 function buildEmail(code) {
   // Get values from form fields
   const artist = document.getElementById("a-name").value || "[ARTIST NAME]";
   const description = document.getElementById("r-description").value || "[DESCRIPTION]";
   const recommended = document.getElementById("recommended-for").value || "[RECOMMENDED]";
-  const releaseDate = document.getElementById("release-date").value || "[RELEASE DATE]";
+  const rawReleaseDate = document.getElementById("release-date").value;
+  const releaseDate = rawReleaseDate ? formatPrettyDate(rawReleaseDate) : "[RELEASE DATE]";
   const albumName = document.getElementById("album-name")?.value || "[ALBUM NAME]";
 
   return [
