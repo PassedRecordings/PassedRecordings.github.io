@@ -72,18 +72,18 @@ vbah-cz9l
   function buildEmail(code) {
     return [
       "Hello!",
-      "I hope this message finds you well. I am [ARTIST NAME] from the atmospheric music collective, Passed Recordings.",
-      "I know you are really busy and already receive tons of requests like this, but I would love to share a copy of [ALBUM NAME] with you!",
-      "[ALBUM NAME] (Release Date: [RELEASE DATE]) is [DESCRIPTION].",
-      "Definitely recommended for fans of [RECOMMENDATION TEXT].",
+      "I hope this message finds you well. I am [ARTIST NAME] from the atmospheric music collective, Passed Recordings. \n",
+      "I know you are really busy and already receive tons of requests like this, but I would love to share a copy of [ALBUM NAME] with you! \n",
+      "[ALBUM NAME] (Release Date: [RELEASE DATE]) is [DESCRIPTION]. \n",
+      "Definitely recommended for fans of [RECOMMENDATION TEXT]. \n",
       "Please head to my Bandcamp page at: https://passedrecordings.bandcamp.com/yum?code=",
       code,
-      ". If it asks for a code, it's",
+      ".\n If it asks for a code, it's",
       code,
-      ".",
-      "Thank you for your time!",
+      ".\n",
+      "Thank you for your time! \n",
       "[ARTIST NAME] // Passed Recordings // Always Atmospheric 🕊️" 
-    ].join("\n");
+    ].join();
   }
 
   function generateEmails() {
