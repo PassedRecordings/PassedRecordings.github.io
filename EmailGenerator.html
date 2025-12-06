@@ -46,85 +46,84 @@ vbah-cz9l
     Template: <span class="small">Option A — Simple</span>
   </footer>
 
-  <script>
-    // Parse pasted codes: accepts newlines, commas, spaces. Removes empty entries.
-    function parseCodes(text) {
-      if (!text) return [];
-      // replace common separators with newline, then split
-      const unified = text.replace(/[,;]+/g, '\\n').replace(/\\s+\\n/g, '\\n');
-      const parts = unified.split(/\\n|\\r|\\s+/).map(s => s.trim()).filter(Boolean);
-      // keep only reasonable-looking codes (optional): remove entries shorter than 3 characters
-      return parts.filter(p => p.length >= 3);
+<script>
+  // Parse pasted codes: only split on newlines or commas
+  function parseCodes(text) {
+    if (!text) return [];
+
+    // Normalize line endings, split on newlines
+    let lines = text.replace(/\r/g, "").split("\n");
+
+    // Also split comma-separated entries (Bandcamp sometimes exports like this)
+    let codes = [];
+    for (let line of lines) {
+      if (!line.trim()) continue;
+
+      // If commas exist, split them
+      let parts = line.split(",").map(x => x.trim()).filter(Boolean);
+      codes.push(...parts);
     }
 
-    // Build single email using Option A (Simple)
-    function buildEmail(code) {
-      return [
-        "Hello,",
-        "",
-        "Here is your download code:",
-        code,
-        "",
-        "Enjoy the music!"
-      ].join("\\n");
+    // Final clean: remove empty or very short junk lines
+    return codes.filter(c => c.length >= 3);
+  }
+
+  // Build single email using Option A (Simple)
+  function buildEmail(code) {
+    return [
+      "Hello,",
+      "",
+      "Here is your download code:",
+      code,
+      "",
+      "Enjoy the music!"
+    ].join("\n");
+  }
+
+  function generateEmails() {
+    const raw = document.getElementById('codesInput').value;
+    const codes = parseCodes(raw);
+
+    if (!codes.length) {
+      alert("No valid codes were found. Make sure each code is on its own line or separated by commas.");
+      return;
     }
 
-    function generateEmails() {
-      const raw = document.getElementById('codesInput').value;
-      const codes = parseCodes(raw);
-      if (!codes.length) {
-        alert('No codes found. Paste your codes into the top box (one per line or comma separated).');
-        return;
-      }
+    const emails = codes.map(code => buildEmail(code));
+    document.getElementById('output').value = emails.join("\n\n---\n\n");
+  }
 
-      const blocks = codes.map(c => buildEmail(c));
-      const joined = blocks.join("\\n\\n---\\n\\n");
-      document.getElementById('output').value = joined;
-    }
+  async function copyAll() {
+    const text = document.getElementById('output').value;
+    if (!text) return alert("Nothing to copy!");
 
-    async function copyAll() {
-      const text = document.getElementById('output').value;
-      if (!text) { alert('Nothing to copy. Generate emails first.'); return; }
-      try {
-        await navigator.clipboard.writeText(text);
-        alert('Copied to clipboard!');
-      } catch (err) {
-        console.error(err);
-        alert('Copy failed — your browser may block clipboard access. Try downloading instead.');
-      }
-    }
+    await navigator.clipboard.writeText(text);
+    alert("Copied!");
+  }
 
-    function downloadTxt() {
-      const text = document.getElementById('output').value;
-      if (!text) { alert('Nothing to download. Generate emails first.'); return; }
-      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'emails.txt';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
+  function downloadTxt() {
+    const text = document.getElementById('output').value;
+    if (!text) return alert("Nothing to download!");
 
-    function clearAll() {
-      if (!confirm('Clear both input and output?')) return;
-      document.getElementById('codesInput').value = '';
-      document.getElementById('output').value = '';
-    }
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "emails.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
-    document.getElementById('generateBtn').addEventListener('click', generateEmails);
-    document.getElementById('copyBtn').addEventListener('click', copyAll);
-    document.getElementById('downloadBtn').addEventListener('click', downloadTxt);
-    document.getElementById('clearBtn').addEventListener('click', clearAll);
+  function clearAll() {
+    document.getElementById('codesInput').value = "";
+    document.getElementById('output').value = "";
+  }
 
-    // Optional: allow Ctrl/Cmd+Enter in input to generate quickly
-    document.getElementById('codesInput').addEventListener('keydown', function(e){
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault(); generateEmails();
-      }
-    });
-  </script>
+  document.getElementById('generateBtn').addEventListener('click', generateEmails);
+  document.getElementById('copyBtn').addEventListener('click', copyAll);
+  document.getElementById('downloadBtn').addEventListener('click', downloadTxt);
+  document.getElementById('clearBtn').addEventListener('click', clearAll);
+</script>
+
 </body>
 </html>
