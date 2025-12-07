@@ -46,6 +46,20 @@ vbah-cz9l
 
   <label for="release-date">Release Date</label>
   <input type="date" id="release-date" name="releasedate"><br><br>
+
+  <label>
+  <input type="checkbox" id="use-ampwall" onclick="toggleAmpwallField()">
+  Include Ampwall link?
+  </label>
+  <br><br>
+
+  <div id="ampwall-field" style="display:none;">
+    <label for="ampwall-link">Ampwall link:</label>
+    <input type="text" id="ampwall-link" placeholder="https://ampwall.com/yourrelease">
+  </div>
+
+<br>
+
   
   <div class="controls">
     <button id="generateBtn" class="primary">Generate Emails</button>
@@ -62,6 +76,14 @@ vbah-cz9l
   </footer>
 
 <script>
+  
+function toggleAmpwallField() {
+  const box = document.getElementById("use-ampwall");
+  const field = document.getElementById("ampwall-field");
+  field.style.display = box.checked ? "block" : "none";
+}
+
+  
   // Parse pasted codes: only split on newlines or commas
   function parseCodes(text) {
     if (!text) return [];
@@ -105,17 +127,23 @@ vbah-cz9l
 }
 
 
-// Build single email 
 function buildEmail(code) {
   // Get values from form fields
-  const artist = document.getElementById("a-name").value || "[ARTIST NAME]";
-  const description = document.getElementById("r-description").value || "[DESCRIPTION]";
-  const recommended = document.getElementById("recommended-for").value || "[RECOMMENDED]";
-  const rawReleaseDate = document.getElementById("release-date").value;
-  const releaseDate = rawReleaseDate ? formatPrettyDate(rawReleaseDate) : "[RELEASE DATE]";
+  const artist = document.getElementById("a-name").value || "a representative";
+  const description = document.getElementById("r-description").value || "absolutely wonderful music";
+  const recommended = document.getElementById("recommended-for").value || "atmospheric music";
   const albumName = document.getElementById("album-name")?.value || "[ALBUM NAME]";
 
-  return [
+  // Release date formatting
+  const rawReleaseDate = document.getElementById("release-date").value;
+  const releaseDate = rawReleaseDate ? formatPrettyDate(rawReleaseDate) : "[RELEASE DATE]";
+
+  // Ampwall (optional)
+  const ampwallEnabled = document.getElementById("use-ampwall").checked;
+  const ampwallLink = document.getElementById("ampwall-link").value;
+
+  // Build email sections
+  const lines = [
     "Hello!",
     "",
     `I hope this message finds you well. I am ${artist} from the atmospheric music collective, Passed Recordings.`,
@@ -131,11 +159,24 @@ function buildEmail(code) {
     "",
     "If the page asks for a code, enter:",
     code,
-    "",
+    ""
+  ];
+
+  // Insert Ampwall line here (AFTER the code section)
+  if (ampwallEnabled && ampwallLink.trim() !== "") {
+    lines.push(`If you prefer Ampwall, you can get the release at the following link: ${ampwallLink}`);
+    lines.push(""); // spacing
+  }
+
+  // Continue final email lines
+  lines.push(
     "Thank you for your time!",
     `${artist} // Passed Recordings // Always Atmospheric 🕊️`
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }
+
 
 
 
