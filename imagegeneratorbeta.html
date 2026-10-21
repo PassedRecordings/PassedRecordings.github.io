@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album Art Social Media Composer</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#121212;
+    color:white;
+    display:flex;
+    height:100vh;
+    overflow:hidden;
+}
+
+.sidebar{
+    width:320px;
+    padding:20px;
+    background:#1e1e1e;
+    overflow-y:auto;
+    box-sizing:border-box;
+}
+
+.sidebar h2{
+    margin-top:0;
+}
+
+.group{
+    margin-bottom:24px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+input,
+select,
+button{
+    width:100%;
+    margin-bottom:10px;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+button{
+    background:#4f46e5;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#4338ca;
+}
+
+.canvas-container-wrapper{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#0d0d0d;
+}
+
+canvas{
+    border:2px solid #333;
+}
+
+.checkbox{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+}
+
+.checkbox input{
+    width:auto;
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>Album Art Composer</h2>
+
+    <div class="group">
+        <label>Background Image</label>
+        <input type="file" id="backgroundUpload" accept="image/*">
+    </div>
+
+    <div class="group">
+        <label>Album Artwork(s)</label>
+        <input type="file" id="artworkUpload" accept="image/*" multiple>
+    </div>
+
+    <div class="group">
+
+        <label>Output Format</label>
+
+        <select id="canvasSize">
+            <option value="1080x1080">Instagram Square (1080x1080)</option>
+            <option value="1080x1350">Instagram Portrait (1080x1350)</option>
+            <option value="1080x1920">Story/Reels (1080x1920)</option>
+            <option value="1200x675">Landscape (1200x675)</option>
+        </select>
+
+        <button onclick="applyCanvasSize()">Apply Size</button>
+
+    </div>
+
+    <div class="group">
+
+        <div class="checkbox">
+            <input type="checkbox" id="blurBackground" checked>
+            <label style="margin:0;">Enhance Background</label>
+        </div>
+
+      <div class="group">
+
+    <label>Background Scale</label>
+    <input
+        type="range"
+        id="bgScale"
+        min="0.5"
+        max="3"
+        step="0.01"
+        value="1">
+
+    <label>X Position</label>
+    <input
+        type="range"
+        id="bgPosX"
+        min="-1000"
+        max="1000"
+        step="1"
+        value="0">
+
+    <label>Y Position</label>
+    <input
+        type="range"
+        id="bgPosY"
+        min="-1000"
+        max="1000"
+        step="1"
+        value="0">
+
+</div>
+
+        <button onclick="refreshBackground()">
+            Update Background
+        </button>
+
+    </div>
+
+    <div class="group">
+        <button onclick="autoArrange()">
+            Auto Arrange Covers
+        </button>
+    </div>
+
+    <div class="group">
+        <button onclick="exportPNG()">
+            Export PNG
+        </button>
+    </div>
+
+    <div class="group">
+        <p>
+            Drag, resize and rotate images directly on the canvas.
+        </p>
+    </div>
+
+</div>
+
+<div class="canvas-container-wrapper">
+    <canvas id="editor"></canvas>
+</div>
+
+<script>
+
+const canvas = new fabric.Canvas('editor', {
+    preserveObjectStacking: true
+});
+
+let backgroundFile = null;
+let backgroundImage = null;
+let albumImages = [];
+
+const DEFAULT_SIZE = {
+    width:1080,
+    height:1080
+};
+
+canvas.setWidth(DEFAULT_SIZE.width);
+canvas.setHeight(DEFAULT_SIZE.height);
+
+function applyCanvasSize(){
+
+    const value = document.getElementById('canvasSize').value;
+    const parts = value.split('x');
+
+    canvas.setWidth(parseInt(parts[0]));
+    canvas.setHeight(parseInt(parts[1]));
+
+    refreshBackground();
+
+    if(albumImages.length){
+        autoArrange();
+    }
+
+    canvas.renderAll();
+}
+
+function refreshBackground(){
+
+    if(!backgroundFile) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        fabric.Image.fromURL(e.target.result,function(img){
+
+            const enhance =
+                document.getElementById('blurBackground').checked;
+
+            const coverScale =
+    Math.max(
+        canvas.width / img.width,
+        canvas.height / img.height
+    );
+
+img.scaleX = coverScale;
+img.scaleY = coverScale;
+
+img.left =
+    (canvas.width - img.width * coverScale) / 2;
+
+img.top =
+    (canvas.height - img.height * coverScale) / 2;
+
+            img.set({
+                selectable:false,
+                evented:false,
+                originX:'left',
+                originY:'top'
+            });
+
+            if(enhance){
+
+                img.filters = [
+                    new fabric.Image.filters.Blur({blur:0.30}),
+                    new fabric.Image.filters.Brightness({brightness:-0.10}),
+                    new fabric.Image.filters.Saturation({saturation:-0.30})
+                ];
+
+                img.applyFilters();
+            }
+
+            canvas.setBackgroundImage(
+                img,
+                canvas.renderAll.bind(canvas)
+            );
+          
+          backgroundImage = img;
+
+updateBackgroundPosition();
+
+            if(enhance){
+
+                const existing =
+                    canvas.getObjects()
+                    .find(x => x.customDarkOverlay);
+
+                if(existing){
+                    canvas.remove(existing);
+                }
+
+                const overlay = new fabric.Rect({
+                    left:0,
+                    top:0,
+                    width:canvas.width,
+                    height:canvas.height,
+                    fill:'rgba(0,0,0,0.30)',
+                    selectable:false,
+                    evented:false
+                });
+
+                overlay.customDarkOverlay = true;
+
+                canvas.insertAt(overlay,0);
+            }
+
+        });
+
+    };
+
+    reader.readAsDataURL(backgroundFile);
+}
+
+document.getElementById('backgroundUpload')
+.addEventListener('change',e=>{
+
+    backgroundFile = e.target.files[0];
+
+    refreshBackground();
+
+  function updateBackgroundPosition(){
+
+    if(!backgroundImage) return;
+
+    const scale =
+        parseFloat(
+            document.getElementById('bgScale').value
+        );
+
+    const x =
+        parseInt(
+            document.getElementById('bgPosX').value
+        );
+
+    const y =
+        parseInt(
+            document.getElementById('bgPosY').value
+        );
+
+    const baseScale =
+        Math.max(
+            canvas.width / backgroundImage.width,
+            canvas.height / backgroundImage.height
+        );
+
+    backgroundImage.scaleX =
+        baseScale * scale;
+
+    backgroundImage.scaleY =
+        baseScale * scale;
+
+    backgroundImage.left =
+        ((canvas.width -
+        (backgroundImage.width *
+        backgroundImage.scaleX)) / 2)
+        + x;
+
+    backgroundImage.top =
+        ((canvas.height -
+        (backgroundImage.height *
+        backgroundImage.scaleY)) / 2)
+        + y;
+
+    canvas.renderAll();
+}
+
+});
+
+document.getElementById('artworkUpload')
+.addEventListener('change',e=>{
+
+    Array.from(e.target.files).forEach(file=>{
+
+        const reader = new FileReader();
+
+        reader.onload = function(ev){
+
+            fabric.Image.fromURL(ev.target.result,function(img){
+
+                img.set({
+                    cornerColor:'#ffffff',
+                    cornerStrokeColor:'#000000',
+                    borderColor:'#ffffff',
+                    cornerSize:12,
+                    transparentCorners:false
+                });
+
+                canvas.add(img);
+                albumImages.push(img);
+
+                autoArrange();
+
+            });
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+});
+
+function autoArrange(){
+
+    const count = albumImages.length;
+
+    if(count === 0) return;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    const radius =
+        Math.min(canvas.width,canvas.height) * 0.30;
+
+    const targetWidth =
+        Math.min(canvas.width,canvas.height) * 0.35;
+
+    albumImages.forEach((img,index)=>{
+
+        img.scaleToWidth(targetWidth);
+
+        if(count === 1){
+
+            img.left =
+                centerX - (img.getScaledWidth()/2);
+
+            img.top =
+                centerY - (img.getScaledHeight()/2);
+
+        }
+
+        else if(count === 2){
+
+            const spacing = targetWidth * 0.65;
+
+            img.left =
+                centerX -
+                spacing +
+                (index * spacing * 2) -
+                (img.getScaledWidth()/2);
+
+            img.top =
+                centerY -
+                (img.getScaledHeight()/2);
+
+        }
+
+        else{
+
+            const angle =
+                ((Math.PI * 2) / count) * index -
+                Math.PI/2;
+
+            img.left =
+                centerX +
+                radius * Math.cos(angle) -
+                (img.getScaledWidth()/2);
+
+            img.top =
+                centerY +
+                radius * Math.sin(angle) -
+                (img.getScaledHeight()/2);
+
+        }
+
+        img.angle = 0;
+
+    });
+
+    canvas.renderAll();
+}
+
+function exportPNG(){
+
+    const dataURL = canvas.toDataURL({
+        format:'png',
+        quality:1,
+        multiplier:1
+    });
+
+    const link = document.createElement('a');
+
+    link.download = 'album-social-post.png';
+    link.href = dataURL;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+document
+.getElementById('bgScale')
+.addEventListener('input',
+    updateBackgroundPosition
+);
+
+document
+.getElementById('bgPosX')
+.addEventListener('input',
+    updateBackgroundPosition
+);
+
+document
+.getElementById('bgPosY')
+.addEventListener('input',
+    updateBackgroundPosition
+);
+
+  
+</script>
+
+</body>
+</html>
