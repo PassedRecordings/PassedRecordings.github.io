@@ -126,13 +126,13 @@ canvas{
       <div class="group">
 
     <label>Background Scale</label>
-    <input
-        type="range"
-        id="bgScale"
-        min="0.5"
-        max="3"
-        step="0.01"
-        value="1">
+<input
+    type="range"
+    id="bgScale"
+    min="1"
+    max="5"
+    step="0.01"
+    value="1">
 
     <label>X Position</label>
     <input
@@ -272,6 +272,10 @@ img.top =
           
           backgroundImage = img;
 
+document.getElementById('bgScale').value = 1;
+document.getElementById('bgPosX').value = 0;
+document.getElementById('bgPosY').value = 0;
+
 updateBackgroundPosition();
 
             if(enhance){
@@ -306,7 +310,53 @@ updateBackgroundPosition();
     reader.readAsDataURL(backgroundFile);
 }
 
-document.getElementById('backgroundUpload')
+  function updateBackgroundPosition(){
+
+    if(!backgroundImage) return;
+
+    const scale =
+        parseFloat(
+            document.getElementById('bgScale').value
+        );
+
+    const x =
+        parseInt(
+            document.getElementById('bgPosX').value
+        );
+
+    const y =
+        parseInt(
+            document.getElementById('bgPosY').value
+        );
+
+    const baseScale =
+        Math.max(
+            canvas.width / backgroundImage.width,
+            canvas.height / backgroundImage.height
+        );
+
+    backgroundImage.scaleX =
+        baseScale * scale;
+
+    backgroundImage.scaleY =
+        baseScale * scale;
+
+    backgroundImage.left =
+        ((canvas.width -
+        (backgroundImage.width *
+        backgroundImage.scaleX)) / 2)
+        + x;
+
+    backgroundImage.top =
+        ((canvas.height -
+        (backgroundImage.height *
+        backgroundImage.scaleY)) / 2)
+        + y;
+
+    canvas.renderAll();
+}
+
+    document.getElementById('backgroundUpload')
 .addEventListener('change',e=>{
 
     backgroundFile = e.target.files[0];
@@ -314,6 +364,7 @@ document.getElementById('backgroundUpload')
     refreshBackground();
 
 });
+
 
 document.getElementById('artworkUpload')
 .addEventListener('change',e=>{
@@ -455,51 +506,7 @@ document
     updateBackgroundPosition
 );
 
-    
-  function updateBackgroundPosition(){
 
-    if(!backgroundImage) return;
-
-    const scale =
-        parseFloat(
-            document.getElementById('bgScale').value
-        );
-
-    const x =
-        parseInt(
-            document.getElementById('bgPosX').value
-        );
-
-    const y =
-        parseInt(
-            document.getElementById('bgPosY').value
-        );
-
-    const baseScale =
-        Math.max(
-            canvas.width / backgroundImage.width,
-            canvas.height / backgroundImage.height
-        );
-
-    backgroundImage.scaleX =
-        baseScale * scale;
-
-    backgroundImage.scaleY =
-        baseScale * scale;
-
-    backgroundImage.left =
-        ((canvas.width -
-        (backgroundImage.width *
-        backgroundImage.scaleX)) / 2)
-        + x;
-
-    backgroundImage.top =
-        ((canvas.height -
-        (backgroundImage.height *
-        backgroundImage.scaleY)) / 2)
-        + y;
-
-    canvas.renderAll();
 }
 
 
