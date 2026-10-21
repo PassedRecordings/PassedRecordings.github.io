@@ -313,52 +313,6 @@ document.getElementById('backgroundUpload')
 
     refreshBackground();
 
-  function updateBackgroundPosition(){
-
-    if(!backgroundImage) return;
-
-    const scale =
-        parseFloat(
-            document.getElementById('bgScale').value
-        );
-
-    const x =
-        parseInt(
-            document.getElementById('bgPosX').value
-        );
-
-    const y =
-        parseInt(
-            document.getElementById('bgPosY').value
-        );
-
-    const baseScale =
-        Math.max(
-            canvas.width / backgroundImage.width,
-            canvas.height / backgroundImage.height
-        );
-
-    backgroundImage.scaleX =
-        baseScale * scale;
-
-    backgroundImage.scaleY =
-        baseScale * scale;
-
-    backgroundImage.left =
-        ((canvas.width -
-        (backgroundImage.width *
-        backgroundImage.scaleX)) / 2)
-        + x;
-
-    backgroundImage.top =
-        ((canvas.height -
-        (backgroundImage.height *
-        backgroundImage.scaleY)) / 2)
-        + y;
-
-    canvas.renderAll();
-}
-
 });
 
 document.getElementById('artworkUpload')
@@ -500,6 +454,54 @@ document
 .addEventListener('input',
     updateBackgroundPosition
 );
+
+    
+  function updateBackgroundPosition(){
+
+    if(!backgroundImage) return;
+
+    const scale =
+        parseFloat(
+            document.getElementById('bgScale').value
+        );
+
+    const x =
+        parseInt(
+            document.getElementById('bgPosX').value
+        );
+
+    const y =
+        parseInt(
+            document.getElementById('bgPosY').value
+        );
+
+    const baseScale =
+        Math.max(
+            canvas.width / backgroundImage.width,
+            canvas.height / backgroundImage.height
+        );
+
+    backgroundImage.scaleX =
+        baseScale * scale;
+
+    backgroundImage.scaleY =
+        baseScale * scale;
+
+    backgroundImage.left =
+        ((canvas.width -
+        (backgroundImage.width *
+        backgroundImage.scaleX)) / 2)
+        + x;
+
+    backgroundImage.top =
+        ((canvas.height -
+        (backgroundImage.height *
+        backgroundImage.scaleY)) / 2)
+        + y;
+
+    canvas.renderAll();
+}
+
 
   
 </script>
