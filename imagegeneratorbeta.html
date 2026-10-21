@@ -6,7 +6,7 @@
 <title>Album Art Social Media Composer</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-
+    
 <style>
 body{
     margin:0;
@@ -133,7 +133,7 @@ canvas{
     max="5"
     step="0.01"
     value="1">
-
+          
     <label>X Position</label>
     <input
         type="range"
@@ -186,6 +186,8 @@ canvas{
 
 <script>
 
+<script>
+
 const canvas = new fabric.Canvas('editor', {
     preserveObjectStacking: true
 });
@@ -195,14 +197,14 @@ let backgroundImage = null;
 let albumImages = [];
 
 const DEFAULT_SIZE = {
-    width:1080,
-    height:1080
+    width: 1080,
+    height: 1080
 };
 
 canvas.setWidth(DEFAULT_SIZE.width);
 canvas.setHeight(DEFAULT_SIZE.height);
 
-function applyCanvasSize(){
+function applyCanvasSize() {
 
     const value = document.getElementById('canvasSize').value;
     const parts = value.split('x');
@@ -212,54 +214,59 @@ function applyCanvasSize(){
 
     refreshBackground();
 
-    if(albumImages.length){
+    if (albumImages.length) {
         autoArrange();
     }
 
     canvas.renderAll();
 }
 
-function refreshBackground(){
+function refreshBackground() {
 
-    if(!backgroundFile) return;
+    if (!backgroundFile) return;
 
     const reader = new FileReader();
 
-    reader.onload = function(e){
+    reader.onload = function (e) {
 
-        fabric.Image.fromURL(e.target.result,function(img){
+        fabric.Image.fromURL(e.target.result, function (img) {
 
             const enhance =
                 document.getElementById('blurBackground').checked;
 
-            const coverScale =
-    Math.max(
-        canvas.width / img.width,
-        canvas.height / img.height
-    );
+            const coverScale = Math.max(
+                canvas.width / img.width,
+                canvas.height / img.height
+            );
 
-img.scaleX = coverScale;
-img.scaleY = coverScale;
+            img.scaleX = coverScale;
+            img.scaleY = coverScale;
 
-img.left =
-    (canvas.width - img.width * coverScale) / 2;
+            img.left =
+                (canvas.width - img.width * coverScale) / 2;
 
-img.top =
-    (canvas.height - img.height * coverScale) / 2;
+            img.top =
+                (canvas.height - img.height * coverScale) / 2;
 
             img.set({
-                selectable:false,
-                evented:false,
-                originX:'left',
-                originY:'top'
+                selectable: false,
+                evented: false,
+                originX: 'left',
+                originY: 'top'
             });
 
-            if(enhance){
+            if (enhance) {
 
                 img.filters = [
-                    new fabric.Image.filters.Blur({blur:0.30}),
-                    new fabric.Image.filters.Brightness({brightness:-0.10}),
-                    new fabric.Image.filters.Saturation({saturation:-0.30})
+                    new fabric.Image.filters.Blur({
+                        blur: 0.30
+                    }),
+                    new fabric.Image.filters.Brightness({
+                        brightness: -0.10
+                    }),
+                    new fabric.Image.filters.Saturation({
+                        saturation: -0.30
+                    })
                 ];
 
                 img.applyFilters();
@@ -269,39 +276,41 @@ img.top =
                 img,
                 canvas.renderAll.bind(canvas)
             );
-          
-          backgroundImage = img;
 
-document.getElementById('bgScale').value = 1;
-document.getElementById('bgPosX').value = 0;
-document.getElementById('bgPosY').value = 0;
+            backgroundImage = img;
 
-updateBackgroundPosition();
+            document.getElementById('bgScale').value = 1;
+            document.getElementById('bgPosX').value = 0;
+            document.getElementById('bgPosY').value = 0;
 
-            if(enhance){
+            updateBackgroundPosition();
 
-                const existing =
-                    canvas.getObjects()
+            const existing =
+                canvas.getObjects()
                     .find(x => x.customDarkOverlay);
 
-                if(existing){
-                    canvas.remove(existing);
-                }
+            if (existing) {
+                canvas.remove(existing);
+            }
+
+            if (enhance) {
 
                 const overlay = new fabric.Rect({
-                    left:0,
-                    top:0,
-                    width:canvas.width,
-                    height:canvas.height,
-                    fill:'rgba(0,0,0,0.30)',
-                    selectable:false,
-                    evented:false
+                    left: 0,
+                    top: 0,
+                    width: canvas.width,
+                    height: canvas.height,
+                    fill: 'rgba(0,0,0,0.30)',
+                    selectable: false,
+                    evented: false
                 });
 
                 overlay.customDarkOverlay = true;
 
-                canvas.insertAt(overlay,0);
+                canvas.insertAt(overlay, 0);
             }
+
+            canvas.renderAll();
 
         });
 
@@ -310,9 +319,9 @@ updateBackgroundPosition();
     reader.readAsDataURL(backgroundFile);
 }
 
-  function updateBackgroundPosition(){
+function updateBackgroundPosition() {
 
-    if(!backgroundImage) return;
+    if (!backgroundImage) return;
 
     const scale =
         parseFloat(
@@ -329,107 +338,105 @@ updateBackgroundPosition();
             document.getElementById('bgPosY').value
         );
 
-    const baseScale =
-        Math.max(
-            canvas.width / backgroundImage.width,
-            canvas.height / backgroundImage.height
-        );
+    const baseScale = Math.max(
+        canvas.width / backgroundImage.width,
+        canvas.height / backgroundImage.height
+    );
 
-    backgroundImage.scaleX =
-        baseScale * scale;
-
-    backgroundImage.scaleY =
-        baseScale * scale;
+    backgroundImage.scaleX = baseScale * scale;
+    backgroundImage.scaleY = baseScale * scale;
 
     backgroundImage.left =
-        ((canvas.width -
-        (backgroundImage.width *
-        backgroundImage.scaleX)) / 2)
-        + x;
+        (
+            canvas.width -
+            (backgroundImage.width * backgroundImage.scaleX)
+        ) / 2 + x;
 
     backgroundImage.top =
-        ((canvas.height -
-        (backgroundImage.height *
-        backgroundImage.scaleY)) / 2)
-        + y;
+        (
+            canvas.height -
+            (backgroundImage.height * backgroundImage.scaleY)
+        ) / 2 + y;
 
     canvas.renderAll();
 }
 
-    document.getElementById('backgroundUpload')
-.addEventListener('change',e=>{
+document.getElementById('backgroundUpload')
+    .addEventListener('change', e => {
 
-    backgroundFile = e.target.files[0];
+        backgroundFile = e.target.files[0];
 
-    refreshBackground();
-
-});
-
-
-document.getElementById('artworkUpload')
-.addEventListener('change',e=>{
-
-    Array.from(e.target.files).forEach(file=>{
-
-        const reader = new FileReader();
-
-        reader.onload = function(ev){
-
-            fabric.Image.fromURL(ev.target.result,function(img){
-
-                img.set({
-                    cornerColor:'#ffffff',
-                    cornerStrokeColor:'#000000',
-                    borderColor:'#ffffff',
-                    cornerSize:12,
-                    transparentCorners:false
-                });
-
-                canvas.add(img);
-                albumImages.push(img);
-
-                autoArrange();
-
-            });
-
-        };
-
-        reader.readAsDataURL(file);
+        refreshBackground();
 
     });
 
-});
+document.getElementById('artworkUpload')
+    .addEventListener('change', e => {
 
-function autoArrange(){
+        Array.from(e.target.files).forEach(file => {
+
+            const reader = new FileReader();
+
+            reader.onload = function (ev) {
+
+                fabric.Image.fromURL(
+                    ev.target.result,
+                    function (img) {
+
+                        img.set({
+                            cornerColor: '#ffffff',
+                            cornerStrokeColor: '#000000',
+                            borderColor: '#ffffff',
+                            cornerSize: 12,
+                            transparentCorners: false
+                        });
+
+                        canvas.add(img);
+                        albumImages.push(img);
+
+                        autoArrange();
+                    }
+                );
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    });
+
+function autoArrange() {
 
     const count = albumImages.length;
 
-    if(count === 0) return;
+    if (count === 0) return;
 
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
     const radius =
-        Math.min(canvas.width,canvas.height) * 0.30;
+        Math.min(canvas.width, canvas.height) * 0.30;
 
     const targetWidth =
-        Math.min(canvas.width,canvas.height) * 0.35;
+        Math.min(canvas.width, canvas.height) * 0.35;
 
-    albumImages.forEach((img,index)=>{
+    albumImages.forEach((img, index) => {
 
         img.scaleToWidth(targetWidth);
 
-        if(count === 1){
+        if (count === 1) {
 
             img.left =
-                centerX - (img.getScaledWidth()/2);
+                centerX -
+                (img.getScaledWidth() / 2);
 
             img.top =
-                centerY - (img.getScaledHeight()/2);
+                centerY -
+                (img.getScaledHeight() / 2);
 
         }
-
-        else if(count === 2){
+        else if (count === 2) {
 
             const spacing = targetWidth * 0.65;
 
@@ -437,30 +444,29 @@ function autoArrange(){
                 centerX -
                 spacing +
                 (index * spacing * 2) -
-                (img.getScaledWidth()/2);
+                (img.getScaledWidth() / 2);
 
             img.top =
                 centerY -
-                (img.getScaledHeight()/2);
+                (img.getScaledHeight() / 2);
 
         }
-
-        else{
+        else {
 
             const angle =
-                ((Math.PI * 2) / count) * index -
-                Math.PI/2;
+                ((Math.PI * 2) / count) *
+                index -
+                Math.PI / 2;
 
             img.left =
                 centerX +
                 radius * Math.cos(angle) -
-                (img.getScaledWidth()/2);
+                (img.getScaledWidth() / 2);
 
             img.top =
                 centerY +
                 radius * Math.sin(angle) -
-                (img.getScaledHeight()/2);
-
+                (img.getScaledHeight() / 2);
         }
 
         img.angle = 0;
@@ -470,47 +476,15 @@ function autoArrange(){
     canvas.renderAll();
 }
 
-function exportPNG(){
+function exportPNG() {
 
     const dataURL = canvas.toDataURL({
-        format:'png',
-        quality:1,
-        multiplier:1
+        format: 'png',
+        quality: 1,
+        multiplier: 1
     });
 
     const link = document.createElement('a');
-
-    link.download = 'album-social-post.png';
-    link.href = dataURL;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-document
-.getElementById('bgScale')
-.addEventListener('input',
-    updateBackgroundPosition
-);
-
-document
-.getElementById('bgPosX')
-.addEventListener('input',
-    updateBackgroundPosition
-);
-
-document
-.getElementById('bgPosY')
-.addEventListener('input',
-    updateBackgroundPosition
-);
-
-
-}
-
-
-  
 </script>
 
 </body>
