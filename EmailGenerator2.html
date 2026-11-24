@@ -117,7 +117,7 @@ const body=`Hi ${r.name},\n\nI hope this message finds you well.\n\nI'm ${artist
  }
  const mixed='----=_PassedRecordings_Mixed_8A4B2C';
  const alt='----=_PassedRecordings_Alt_8A4B2C';
- const html=escapeHtml(body).replace('Thank you for your time.','<img src="cid:campaign-image" alt="Campaign image" style="max-width:50%;height:auto"><br><br>Thank you for your time.');
+ const html=escapeHtml(body).replace('Thank you for your time.','<img src="cid:campaign-image" alt="Campaign image" style="max-width:20%;height:auto"><br><br>Thank you for your time.');
  return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nX-Unsent: 1\nContent-Type: multipart/related; boundary="${mixed}"; type="multipart/alternative"\n\n--${mixed}\nContent-Type: multipart/alternative; boundary="${alt}"\n\n--${alt}\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n\n${body}\n\n--${alt}\nContent-Type: text/html; charset=utf-8\nContent-Transfer-Encoding: base64\n\n${encodeBase64Utf8(`<!doctype html><html><body>${html}</body></html>`)}\n\n--${alt}--\n\n--${mixed}\nContent-Type: ${uploadedImage.mime}; name="campaign-image"\nContent-Transfer-Encoding: base64\nContent-ID: <campaign-image>\nContent-Disposition: inline; filename="campaign-image"\n\n${wrapBase64(uploadedImage.base64)}\n\n--${mixed}--`;
 }
 previewBtn.onclick=()=>{
