@@ -111,7 +111,7 @@ function encodeBase64Utf8(text){
 }
 function wrapBase64(value){return value.replace(/(.{76})/g,'$1\r\n').replace(/\r\n$/,'');}
 function buildEML(r,code){
-const body=`Hi ${r.name},\n\nI hope this message finds you well.\n\nI'm ${artist.value} from Passed Recordings. I know you are really busy and already receive tons of requests like this, but I'd love to share a promo copy of ${release.value} with ${r.show}.\n\n${release.value} (Release Date: ${releaseDate.value}) is ${description.value}.\n\nRecommended for fans of ${recommended.value}.\n\nRedeem here:\nhttps://passedrecordings.bandcamp.com/yum?code=${code}\n\nCode: ${code}\n\nThank you for your time.\n\n${artist.value}`;
+const body=`Hi ${r.name},\n\nI hope this message finds you well.\n\nI'm ${artist.value} from Passed Recordings. I know you are really busy and already receive tons of requests like this, but I'd love to share a promo copy of ${release.value} with ${r.show}.\n\n${release.value} (Release Date: ${releaseDate.value}) is ${description.value}.\n\nRecommended for fans of ${recommended.value}.\n\nRedeem here:\nhttps://passedrecordings.bandcamp.com/yum?code=${code}\n\nCode: ${code}\n\nThank you for your time.\n\n${artist.value} // Passed Recordings // Absolute Atmosphere 🕊️`;
  if(!uploadedImage){
   return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nX-Unsent: 1\n\n${body}`;
  }
