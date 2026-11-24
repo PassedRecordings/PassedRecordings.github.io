@@ -67,7 +67,7 @@ function parseCodes(t){return t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
 function subjectFor(r){return document.getElementById('subject').value.replaceAll('{{artist}}',artist.value).replaceAll('{{release}}',release.value).replaceAll('{{show}}',r.show).replaceAll('{{name}}',r.name);}
 function buildEML(r,code){
  const body=`Hi ${r.name},\n\nI hope you're well.\n\nI'm ${artist.value} from Passed Recordings. I'd love to share a promo copy of ${release.value} with ${r.show}.\n\n${release.value} is ${description.value}.\n\nRecommended for fans of ${recommended.value}.\n\nRedeem here:\nhttps://passedrecordings.bandcamp.com/yum?code=${code}\n\nCode: ${code}\n\nThank you for your time.\n\n${artist.value}`;
- return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\n\n${body}`;
+ return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nX-Unsent: 1\n\n${body}`;
 }
 previewBtn.onclick=()=>{
  const r=parseRecipients(csv.value)[0];
