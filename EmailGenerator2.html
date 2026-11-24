@@ -27,6 +27,14 @@ button{padding:10px 16px;margin-right:8px}
 <input id='subject' value='Review copy: {{release}} by {{artist}}'>
 </div>
 
+<div class='section'>
+<h2>Campaign Image</h2>
+<p>Optional — the image will be embedded immediately before “Thank you for your time”.</p>
+<input id='imageUpload' type='file' accept='image/png,image/jpeg,image/gif,image/webp'>
+<button id='clearImageBtn' type='button'>Clear Image</button>
+<div id='imageStatus'>No image selected.</div>
+</div>
+
 <div class='grid'>
 <div class='section'>
 <h2>Recipients CSV</h2>
@@ -57,6 +65,32 @@ GHI789</textarea>
 </div>
 
 <script>
+let uploadedImage=null;
+
+imageUpload.onchange=()=>{
+ const file=imageUpload.files[0];
+ if(!file){uploadedImage=null;imageStatus.textContent='No image selected.';return;}
+ if(!['image/png','image/jpeg','image/gif','image/webp'].includes(file.type)){
+  uploadedImage=null;imageUpload.value='';imageStatus.textContent='Please select a PNG, JPEG, GIF, or WebP image.';return;
+ }
+ if(file.size>5*1024*1024){
+  uploadedImage=null;imageUpload.value='';imageStatus.textContent='Image must be 5 MB or smaller.';return;
+ }
+ const reader=new FileReader();
+ reader.onload=()=>{
+  uploadedImage={mime:file.type,base64:reader.result.split(',')[1]};
+  imageStatus.textContent=`Selected: ${file.name}`;
+ };
+ reader.onerror=()=>{uploadedImage=null;imageStatus.textContent='Could not read the selected image.';};
+ reader.readAsDataURL(file);
+};
+
+clearImageBtn.onclick=()=>{
+ uploadedImage=null;
+ imageUpload.value='';
+ imageStatus.textContent='No image selected.';
+};
+
 function parseRecipients(t){
  const lines=t.trim().split(/\r?\n/).slice(1);
  return lines.map(l=>{
@@ -66,9 +100,25 @@ function parseRecipients(t){
 }
 function parseCodes(t){return t.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);}
 function subjectFor(r){return document.getElementById('subject').value.replaceAll('{{artist}}',artist.value).replaceAll('{{release}}',release.value).replaceAll('{{show}}',r.show).replaceAll('{{name}}',r.name);}
+function escapeHtml(text){
+ return text.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).replace(/\n/g,'<br>\n');
+}
+function encodeBase64Utf8(text){
+ const bytes=new TextEncoder().encode(text);
+ let binary='';
+ for(let i=0;i<bytes.length;i+=8192) binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+ return btoa(binary).replace(/(.{76})/g,'$1\r\n');
+}
+function wrapBase64(value){return value.replace(/(.{76})/g,'$1\r\n').replace(/\r\n$/,'');}
 function buildEML(r,code){
 const body=`Hi ${r.name},\n\nI hope this message finds you well.\n\nI'm ${artist.value} from Passed Recordings. I know you are really busy and already receive tons of requests like this, but I'd love to share a promo copy of ${release.value} with ${r.show}.\n\n${release.value} (Release Date: ${releaseDate.value}) is ${description.value}.\n\nRecommended for fans of ${recommended.value}.\n\nRedeem here:\nhttps://passedrecordings.bandcamp.com/yum?code=${code}\n\nCode: ${code}\n\nThank you for your time.\n\n${artist.value}`;
-return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nX-Unsent: 1\n\n${body}`;
+ if(!uploadedImage){
+  return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nContent-Type: text/plain; charset=utf-8\nX-Unsent: 1\n\n${body}`;
+ }
+ const mixed='----=_PassedRecordings_Mixed_8A4B2C';
+ const alt='----=_PassedRecordings_Alt_8A4B2C';
+ const html=escapeHtml(body).replace('Thank you for your time.','<img src="cid:campaign-image" alt="Campaign image" style="max-width:100%;height:auto"><br><br>Thank you for your time.');
+ return `To: ${r.email}\nSubject: ${subjectFor(r)}\nMIME-Version: 1.0\nX-Unsent: 1\nContent-Type: multipart/related; boundary="${mixed}"; type="multipart/alternative"\n\n--${mixed}\nContent-Type: multipart/alternative; boundary="${alt}"\n\n--${alt}\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n\n${body}\n\n--${alt}\nContent-Type: text/html; charset=utf-8\nContent-Transfer-Encoding: base64\n\n${encodeBase64Utf8(`<!doctype html><html><body>${html}</body></html>`)}\n\n--${alt}--\n\n--${mixed}\nContent-Type: ${uploadedImage.mime}; name="campaign-image"\nContent-Transfer-Encoding: base64\nContent-ID: <campaign-image>\nContent-Disposition: inline; filename="campaign-image"\n\n${wrapBase64(uploadedImage.base64)}\n\n--${mixed}--`;
 }
 previewBtn.onclick=()=>{
  const r=parseRecipients(csv.value)[0];
