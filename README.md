@@ -16,7 +16,7 @@
    
 <img width="1107" height="246" alt="image" src="https://github.com/user-attachments/assets/2a7468b1-0dd7-4987-8268-1f736f029b5d" />
 
-5. Now the fiddly bit... have your bandcamp codes and the promo list (AS A CSV) downloaded top your machine.
+5. Now the fiddly bit... have your bandcamp codes and the promo list (AS A CSV) downloaded to your machine.
  
 6. Open the bandcamp codes with a spreadsheet program such as Libreoffice Calc or Microsoft Excel.
 
